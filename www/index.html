@@ -49,6 +49,7 @@
 			<input type="hidden" name="inventoryID" value="">
 			<input type="hidden" name="logID" value="">
 			<input type="hidden" name="language" value="">
+			<input type="hidden" name="user_type" value="">
 			<!---->
             <h1 class="title">Fleet Maintenance Management System</h1>
             <div id="deviceready">
@@ -65,20 +66,35 @@
 				<section id="page2" class="page">
 					<img src="img/banner.png" class="main_logo"> 
 					<p id="user_name"></p>
-					<span id="admin" class="button log red" onclick="truck_status()">
-						Truck Status
-					</span>
-					<span class="button log black" onclick="load('page4', '0')">
-						New Log
-					</span>
+					<div class="admin">
+						<span class="button log red" onclick="truck_status()">
+							Truck Status
+						</span>
+					</div>
+					<div class="mech">
+						<span class="button log black" onclick="load('page4', '0')">
+							New Log
+						</span>
+						<br/>
+						<span class="button log black" onclick="get_pending()">
+							Pending Logs
+						</span>
+						<br/>
+						<span class="button log black" onclick="get_request()">
+							Requests
+						</span>
+					</div>
 					<br/>
-					<span class="button log black" onclick="get_pending()">
-						Pending Logs
-					</span>
-					<br/>
-					<span class="button log black" onclick="get_request()">
-						Requests
-					</span>
+					<div class="driver">
+						<span class="button log red" onclick="load('page16', '0')">
+							Create Request
+						</span>
+					</div>
+					<div class="sticky">
+						<span class="button red center" onclick="log_out()">
+							Log Out
+						</span>
+					</div>
 				</section>
 
 				<!--Page 3: Pending Logs-->
@@ -128,6 +144,23 @@
 						</span>
 						<span class="button green left bottom" onclick="accept_request()">
 							Accept
+						</span>
+					</div>
+				</section>
+				
+				<!--Page 16: Driver Create Request-->
+				<section id="page16" class="page">
+					<h1>Create Request</h1>
+					<select id="get_trucks" name="IID">
+					</select>
+					<br/>
+					<textarea class="text_area" name="driver_request" rows="10" cols="60"></textarea>
+					<div class="sticky">
+						<span class="button onyx left bottom" onclick="load('page2', '0')">
+							Home
+						</span>
+						<span class="button green left bottom" onclick="set_request()">
+							Create
 						</span>
 					</div>
 				</section>

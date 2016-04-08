@@ -12,9 +12,14 @@ $(document).ready(function() {
 	}, 200);
 	
 	/**/
+	$(".admin").hide();
+	$(".driver").hide();
+	
+	/**/
 	get_users();
 	get_logs();
 	get_trucks();
+	get_truck();
 	
 	/**/
 	milage_check();
@@ -50,7 +55,7 @@ function load_pending(logID) {
 	
 	$("input[name='logID']").val(logID);
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { pend: '1', logID: logID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { pend: '1', logID: logID })
 	.done(function( data ) {
 		load(data, '0');
 	});
@@ -63,7 +68,7 @@ function load_request(logID, iID) {
 	$("input[name='logID']").val(logID);
 	$("input[name='inventoryID']").val(iID);
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { req: '1', logID: logID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { req: '1', logID: logID })
 	.done(function( data ) {
 		$('#log_request').html(data);
 		load('page15', '0');
@@ -77,7 +82,7 @@ function accept_request() {
 	logID = $("input[name='logID']").val();
 	userID = $("input[name='userID']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { accept: '1', logID: logID, userID: userID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { accept: '1', logID: logID, userID: userID })
 	.done(function( data ) {
 		if(data == 'false') {
 			appAlert('Error. Unable to connect to serve. Close the app and try again.');
@@ -88,18 +93,65 @@ function accept_request() {
 	});
 }
 
+function load_options() {
+	var type;
+	
+	type = $("input[name='user_type']").val();
+	
+	if (type == 'A') {
+		load('page2', '0');
+		$(".admin").show();
+		$(".driver").show();
+	}
+	else if (type == 'D') {
+		load('page2', '0');
+		$(".driver").show();
+		$(".mech").hide();
+	}
+	else {
+		load('page2', '0');
+		$(".mech").show();
+	}
+}
+
+function log_out() {
+	function onConfirm(buttonIndex) {
+		if (buttonIndex == 2) {
+			load('page1', '0');
+			fresh_start();
+		}
+		else {
+			
+		}
+	}
+
+	navigator.notification.confirm(
+		'Do you wish to go to log out?', // message
+		 onConfirm,            // callback to invoke with index of button pressed
+		'Transcar Maintenance',           // title
+		['No','Yes']     // buttonLabels
+	);
+}
+
 /**/
 function fresh_start() {
+	$(".admin").hide();
+	$(".driver").hide();
+	
 	$("input[name='userID']").val('');
 	$("input[name='user_pin']").val('');
 	$("input[name='inventoryID']").val('');
 	$("input[name='logID']").val('');
+	$("input[name='language']").val('');
+	$("input[name='user_type']").val('');
 	
 	$("input[name='mileage']").val('');
 	$("select[name='type']").val('');
+	$("select[name='IID']").val('');
 	
 	$("textarea[name='driver_remarks']").val('');
 	$("textarea[name='mechanic_remarks']").val('');
+	$("textarea[name='driver_request']").val('');
 	
 	$("input[name='p_description']").val('');
 	$("input[name='p_num']").val('');
@@ -110,7 +162,7 @@ function fresh_start() {
 }
 
 function test_connection() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { test: '1' })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { test: '1' })
 	.done(function( data ) {
 		if (data == 'false') {
 			appAlert('Error. Unable to connect to serve. Close the app and try again.');
@@ -121,14 +173,8 @@ function test_connection() {
 	});
 }
 
-function delete_log() {
-	var logID;
-	
-	logID = $("input[name='logID']").val();
-}
-
 function truck_status() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { truck_status: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { truck_status: "1" })
 	.done(function( data ) {
 		$('#truck_status').html(data);
 	});
@@ -138,7 +184,7 @@ function truck_status() {
 
 /*Get Functions*/
 function get_users() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { users: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { users: "1" })
 	.done(function( data ) {
 		$('#users_data').html(data);
 	});
@@ -149,14 +195,14 @@ function get_name() {
 	
 	id = $("input[name='userID']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { name: id })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { name: id })
 	.done(function( data ) {
 		$('#user_name').html(data);
 	});
 }
 
 function get_logs() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { logs: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { logs: "1" })
 	.done(function( data ) {
 		$('#view_logs').html(data);
 	});
@@ -167,14 +213,14 @@ function get_maintenance() {
 	
 	lan = $("input[name='language']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { truck: "1", language: lan })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { truck: "1", language: lan })
 	.done(function( data ) {
 		$('#maintenance_type').html(data);
 	});
 }
 
 function get_trucks() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { trucks: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { trucks: "1" })
 	.done(function( data ) {
 		$('#view_trucks').html(data);
 	});
@@ -185,7 +231,7 @@ function get_repairs() {
 	
 	lan = $("input[name='language']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { repair: "1", language: lan  })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { repair: "1", language: lan  })
 	.done(function( data ) {
 		$('#view_repair').html(data);
 	});
@@ -198,7 +244,7 @@ function get_logID() {
 	uID = $("input[name='userID']").val();	
 	iID = $("input[name='inventoryID']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { log: '1', uID: uID, inventoryID: iID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { log: '1', uID: uID, inventoryID: iID })
 	.done(function( data ) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -215,7 +261,7 @@ function get_type() {
 	
 	iID = $("input[name='inventoryID']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { v_type: '1', inventoryID: iID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { v_type: '1', inventoryID: iID })
 	.done(function( data ) {
 		if (data == 'Truck') {
 			$(".pick_type").show();
@@ -233,14 +279,14 @@ function get_photos() {
 	var logID;
 	logID = $("input[name='logID']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { photo: "1", logID: logID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { photo: "1", logID: logID })
 	.done(function( data ) {
 		$('#upPhotos').html(data);
 	});
 }
 
 function get_pending() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { pending: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { pending: "1" })
 	.done(function( data ) {
 		$('#pending_logs').html(data);
 	});
@@ -249,7 +295,7 @@ function get_pending() {
 }
 
 function get_request() {
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { request: "1" })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { request: "1" })
 	.done(function( data ) {
 		$('#request_logs').html(data);
 	});
@@ -261,7 +307,7 @@ function get_language() {
 	var userID;
 	userID = $("input[name='userID']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { lan: "1", id: userID })
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { lan: "1", id: userID })
 	.done(function( data ) {
 		 $("input[name='language']").val(data)
 	});
@@ -271,6 +317,23 @@ function get_language() {
 
 function get_page() {
 	$("input[name='userID']").val(userID);
+}
+
+function get_permission() {
+	var userID;
+	userID = $("input[name='userID']").val();
+	
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { perm: "1", id: userID })
+	.done(function( data ) {
+		 $("input[name='user_type']").val(data)
+	});
+}
+
+function get_truck() {
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { driver: "1" })
+	.done(function( data ) {
+		$('#get_trucks').html(data);
+	});
 }
 
 /*Set Functions*/
@@ -283,6 +346,7 @@ function set_users(userID) {
 
 	appPrompt('pin');
 	get_name();
+	get_permission();
 }
 
 function set_pin() {
@@ -292,14 +356,14 @@ function set_pin() {
 	id = $("input[name='userID']").val();	
 	pin = $("input[name='user_pin']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { user_pin: pin,  user_id: id})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { user_pin: pin,  user_id: id})
 	.done(function(data) {
 		if (data != 'true') {
 			appAlert('Error. Invalid Password. Try Again!');
 		}
 		else {
-			load('page2', '0');
-			 get_language();
+			load_options();
+			get_language();
 		}
 	});
 }
@@ -323,7 +387,7 @@ function set_milage() {
 	m = $("input[name='mileage']").val();
 	t = $("select[name='type']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { mile: '1', mileage: m, type: t, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { mile: '1', mileage: m, type: t, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -344,7 +408,7 @@ function set_remarks() {
 	d = $("textarea[name='driver_remarks']").val();
 	m = $("textarea[name='mechanic_remarks']").val();
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { remarks: '1', driver: d, mechanic: m, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { remarks: '1', driver: d, mechanic: m, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -367,7 +431,7 @@ function set_repairs() {
 	logID = $("input[name='logID']").val();	
 
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { repairs: '1', rMade: re, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { repairs: '1', rMade: re, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -405,7 +469,7 @@ function set_parts() {
 	logID = $("input[name='logID']").val();	
 
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { parts: '1', p_description: pd, p_num: pn, p_vendor: pv, p_date: pdt, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { parts: '1', p_description: pd, p_num: pn, p_vendor: pv, p_date: pdt, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -423,7 +487,7 @@ function set_stats(val) {
 	
 	logID = $("input[name='logID']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { stats: '1', status: val, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { stats: '1', status: val, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			appAlert('Error. A problem occured.');
@@ -442,7 +506,7 @@ function set_page(dbPage) {
 	
 	logID = $("input[name='logID']").val();	
 	
-	$.post( "http://ignitetx.com/vmms/app/pages.php", { dataPage: dbPage, logID: logID})
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { dataPage: dbPage, logID: logID})
 	.done(function(data) {
 		if (data == 'false') {
 			/**/
@@ -477,6 +541,27 @@ function set_language() {
 		$("#span").show();
 	}
 	
+}
+
+function set_request() {
+	var IID;
+	var dr;
+	var userIDs;
+	
+	IID = $("select[name='IID']").val();
+	dr = $("textarea[name='driver_request']").val();
+	userID = $("input[name='logID']").val();	
+	
+	$.post( "http://fmms.transcarexpress.com/app/pages.php", { driv_req: '1', id: userID, iid: IID, req: dr})
+	.done(function(data) {
+		if (data == 'false') {
+			appAlert('Error. A problem occured.');
+			load('page1', '0');
+		}
+		else {
+			load('page2', '0');
+		}
+	});
 }
 
 /**/
@@ -674,7 +759,7 @@ function uploadPhoto(imageURI) {
 	var logID;
 	logID = $("input[name='logID']").val();
    
-	ft.upload(imageURI, "http://ignitetx.com/vmms/app/pages.php?photo=" + logID, win, fail, options);
+	ft.upload(imageURI, "http://fmms.transcarexpress.com/app/pages.php?photo=" + logID, win, fail, options);
 	
 	get_photos();
 }
